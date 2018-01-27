@@ -1,6 +1,6 @@
 
 pos=my_jieping;
-s=serial('com9');
+s=serial('com3');
 s.BaudRate=115200;
 fopen(s);
 pause(0.5);
@@ -12,7 +12,15 @@ while 1
     %img=imread('dump.jpg');
     img_hsv=rgb2hsv(img);
     obj=img_hsv(:,:,1)<0.8&img_hsv(:,:,1)>0.6&img_hsv(:,:,2)>0.12&img_hsv(:,:,2)<0.5&img_hsv(:,:,3)<0.6;
-    screen=~(img_hsv(:,:,1)<0.8&img_hsv(:,:,1)>0.4&img_hsv(:,:,2)<0.4&img_hsv(:,:,2)>0.08);
+    tmp_h_=img_hsv(1,1,1);
+    tmp_s_=img_hsv(1,1,2);
+    tmp_v_=img_hsv(1,1,3);
+    
+    screen=~(img_hsv(:,:,1)<(tmp_h_+0.14)...
+            &img_hsv(:,:,1)>(tmp_h_-0.14) ...
+            &img_hsv(:,:,2)<(tmp_s_+0.14)...
+            &img_hsv(:,:,2)>(tmp_s_-0.14)...
+                    );
     se=strel('disk',6);
     obj=imopen(obj,se);
     
@@ -48,7 +56,7 @@ while 1
     plot(min_row_col,min_row,'color','b','markersize',20,'marker','.');
     J=abs(obj_pos(1)-min_row_col)/cos(pi/6);
     fprintf(['length is ',num2str(J),'\n']);
-    X(5)=uint8(10+J/3);
+    X(5)=uint8(10+J/3.12);
     sum_t=0;
     for i=1:5
         sum_t=sum_t+double(X(i));
